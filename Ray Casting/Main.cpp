@@ -171,9 +171,9 @@ int main()
 			int lineHeight = abs(int(WIDTH / perpWallDist));
 
 			//calculate lowest and highest pixel to fill in current stripe
-			int drawStart = -lineHeight / 2 + WIDTH / 2;
+			int drawStart = -lineHeight / 2 + WIDTH / 2 * 0.9f;
 			if (drawStart < 0)drawStart = 0;
-			int drawEnd = lineHeight / 2 + WIDTH / 2;
+			int drawEnd = lineHeight / 2 + WIDTH / 2 * 0.9f;
 			if (drawEnd >= WIDTH)drawEnd = WIDTH - 1;
 
 			//choose wall color
@@ -192,8 +192,6 @@ int main()
 				color = sf::Color(color.r / 2, color.g / 2, color.b / 2);
 			}
 
-			//draw the pixels of the stripe as a vertical line
-			//verLine(x, drawStart, drawEnd, color);
 
 			sf::Vertex line[2] =
 			{
@@ -213,17 +211,20 @@ int main()
 
 bool check(const sf::Vector2f pos, const sf::Vector2f block)
 {
-	sf::Vector2i front = sf::Vector2i(pos - block);
-	sf::Vector2i back = sf::Vector2i(pos + block);
-	if (front.x < 0 || front.y < 0 || back.x > MAP_WIDTH || back.y > MAP_HEIGHT) return false;
-
-	for (int i = front.y; i <= back.y; ++i)
+	
+	sf::Vector2i front = sf::Vector2i(pos + block);
+	sf::Vector2i back = sf::Vector2i(pos - block);
+	if (front.x > MAP_HEIGHT || front.y > MAP_WIDTH || back.x < 0 || back.y < 0)
 	{
-		for (int j = front.x; j <= back.x; ++j)
-		{
-			if (Map[j][i] != 0)
-				return false;
-		}
+		std::cout << "out of bounds" << std::endl;
+		return false;
 	}
+
+	if (Map[int(pos.x)][int(pos.y)] != 0 || Map[front.x][front.y] != 0 || Map[back.x][back.y] != 0)
+	{
+		std::cout << "invalid position " << std::endl;
+		return false;
+	}
+	
 	return true;
 }
